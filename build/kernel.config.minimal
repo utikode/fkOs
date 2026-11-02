@@ -1,0 +1,9 @@
+# Minimal Linux LTS kernel config (placeholder)
+CONFIG_64BIT=y
+CONFIG_SMP=y
+CONFIG_EXT4_FS=y
+CONFIG_VIRTIO=y
+CONFIG_DRM=y
+CONFIG_NET=y
+CONFIG_DEVTMPFS=y
+# TODO: expand

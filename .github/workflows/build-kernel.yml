@@ -1,0 +1,42 @@
+name: Build fkOs Kernel
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build-kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git wget curl bc libssl-dev libelf-dev bison flex
+
+      - name: Download Linux LTS kernel
+        run: |
+          mkdir -p build
+          cd build
+          wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.12.43.tar.xz
+          tar -xf linux-6.12.43.tar.xz
+
+      - name: Configure kernel
+        run: |
+          cd build/linux-6.12.43
+          cp ../../build/kernel.config.minimal .config 2>/dev/null || true
+          make olddefconfig
+
+      - name: Build kernel
+        run: |
+          cd build/linux-6.12.43
+          make -j$(nproc) bzImage
+
+      - name: Upload kernel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fkOs-kernel
+          path: build/linux-6.12.43/arch/x86/boot/bzImage

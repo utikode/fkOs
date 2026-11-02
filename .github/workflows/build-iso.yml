@@ -1,0 +1,35 @@
+name: Build fkOs ISO
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y debootstrap squashfs-tools grub-pc-bin grub-efi-amd64-bin xorriso mtools
+
+      - name: Create rootfs
+        run: |
+          sudo debootstrap --variant=minbase noble /tmp/fkos-rootfs http://archive.ubuntu.com/ubuntu
+
+      - name: Configure rootfs
+        run: |
+          sudo chroot /tmp/fkos-rootfs /bin/bash -c "apt-get update && apt-get install -y linux-image-generic systemd"
+
+      - name: Build ISO (placeholder)
+        run: |
+          echo "ISO build steps go here"
+          # TODO: implement full ISO creation with GRUB + squashfs
+
+      - name: Upload ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: fkOs-iso
+          path: fkOs.iso
