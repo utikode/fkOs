@@ -13,45 +13,23 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y debootstrap squashfs-tools \
-            grub-pc-bin grub-efi-amd64-bin xorriso \
-            qemu-system-x86_64 mtools dosfstools
+          sudo apt-get install -y debootstrap squashfs-tools grub-pc-bin grub-efi-amd64-bin xorriso mtools
 
-      - name: Download kernel artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: fkOs-kernel
-          path: build/kernel-image/
-
-      - name: Setup rootfs
+      - name: Create rootfs
         run: |
-          chmod +x build/rootfs/setup.sh
-          sudo ./build/rootfs/setup.sh
+          sudo debootstrap --variant=minbase noble /tmp/fkos-rootfs http://archive.ubuntu.com/ubuntu
 
-      - name: Build ISO
+      - name: Configure rootfs
         run: |
-          chmod +x build/build-iso.sh
-          sudo ./build/build-iso.sh
+          sudo chroot /tmp/fkos-rootfs /bin/bash -c "apt-get update && apt-get install -y linux-image-generic systemd"
+
+      - name: Build ISO (placeholder)
+        run: |
+          echo "ISO build steps go here"
+          # TODO: implement full ISO creation with GRUB + squashfs
 
       - name: Upload ISO
         uses: actions/upload-artifact@v4
         with:
           name: fkOs-iso
           path: fkOs.iso
-```
-
-### 📌 File Location:
-- `.github/workflows/build-iso.yml` → `fkOs/.github/workflows/build-iso.yml`
-
-### 📝 Notes:
-- This workflow:
-  1. Downloads the kernel artifact from GitHub Actions
-  2. Creates rootfs using the setup.sh script
-  3. Builds the ISO with GRUB2 and SquashFS
-  4. Uploads fkOs.iso as an artifact
-
-### 📝 Next Steps:
-1. Push these files to GitHub
-2. Go to GitHub → Actions → Build fkOs ISO → Run workflow
-3. Download fkOs.iso when complete
-4. Test with QEMU or burn to USB
