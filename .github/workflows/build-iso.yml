@@ -21,7 +21,20 @@ jobs:
 
       - name: Configure rootfs
         run: |
+          # 1. Mengaitkan direktori kernel host ke dalam chroot rootfs
+          sudo mount -t proc /proc /tmp/fkos-rootfs/proc
+          sudo mount -t sysfs /sys /tmp/fkos-rootfs/sys
+          sudo mount --bind /dev /tmp/fkos-rootfs/dev
+          sudo mount --bind /dev/pts /tmp/fkos-rootfs/dev/pts
+
+          # 2. Menjalankan perintah chroot dengan aman
           sudo chroot /tmp/fkos-rootfs /bin/bash -c "apt-get update && apt-get install -y linux-image-generic systemd"
+
+          # 3. Bersih-bersih (Unmount) setelah selesai agar tidak mengunci runner
+          sudo umount -l /tmp/fkos-rootfs/dev/pts
+          sudo umount -l /tmp/fkos-rootfs/dev
+          sudo umount -l /tmp/fkos-rootfs/sys
+          sudo umount -l /tmp/fkos-rootfs/proc
 
       - name: Build ISO (placeholder)
         run: |
