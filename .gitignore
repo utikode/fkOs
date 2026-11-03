@@ -1,0 +1,20 @@
+# Build artifacts
+rootfs/
+kernel-image/
+boot/
+*.iso
+*.squashfs
+*.img
+*.gz
+*.tar.xz
+
+# debootstrap temp
+debootstrap/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS files
+Thumbs.db
+.DS_Store
